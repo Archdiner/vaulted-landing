@@ -1,0 +1,372 @@
+import { useRef, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Nfc, ArrowRight } from 'lucide-react';
+
+const AMBER = '#C08B3A';
+const AMBER_RGBA = (o) => `rgba(192, 139, 58, ${o})`;
+
+// Extracted sub-component so useTransform isn't called inside a .map() (hooks rules violation)
+const ChaoticCard = ({ card, scrollYProgress }) => {
+  const x = useTransform(scrollYProgress, [0.1, 0.3], [card.startX, '0vw']);
+  const y = useTransform(scrollYProgress, [0.1, 0.3], [card.startY, '0vh']);
+  const rotate = useTransform(scrollYProgress, [0.1, 0.3], [card.rotation, card.rotation - 180]);
+  return (
+    <motion.div
+      style={{ x, y, rotate }}
+      className="absolute w-28 h-16 sm:w-32 sm:h-20 bg-white rounded-lg border border-black/8 shadow-[0_4px_20px_rgba(0,0,0,0.12)] flex flex-col justify-between p-3"
+    >
+      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: AMBER, opacity: 0.7 }} />
+      <div className="space-y-1">
+        <div className="h-1.5 w-full bg-black/10 rounded" />
+        <div className="h-1.5 w-2/3 bg-black/6 rounded" />
+      </div>
+    </motion.div>
+  );
+};
+
+
+
+export const Scrollytelling = () => {
+  const containerRef = useRef(null);
+  const [activeTab, setActiveTab] = useState('flow');
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  const introOpacity = useTransform(scrollYProgress, [0, 0.08, 0.12, 0.15], [1, 1, 0, 0]);
+  const introY = useTransform(scrollYProgress, [0, 0.15], [0, -50]);
+  const introScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.95]);
+
+  const cardsScale = useTransform(scrollYProgress, [0.1, 0.2, 0.3], [5, 1, 0.9]);
+  const cardsOpacity = useTransform(scrollYProgress, [0.1, 0.15, 0.28, 0.35], [0, 1, 1, 0]);
+
+  const passScale = useTransform(scrollYProgress, [0.25, 0.35, 0.55, 0.65], [0.5, 1, 1, 0.8]);
+  const passOpacity = useTransform(scrollYProgress, [0.28, 0.35, 0.55, 0.6], [0, 1, 1, 0]);
+  const passX = useTransform(scrollYProgress, [0.4, 0.48], ["0%", "25vw"]);
+
+  const meetVaultedTextOpacity = useTransform(scrollYProgress, [0.32, 0.38, 0.42, 0.45], [0, 1, 1, 0]);
+  const meetVaultedTextY = useTransform(scrollYProgress, [0.32, 0.38], [50, 0]);
+
+  const overviewOpacity = useTransform(scrollYProgress, [0.45, 0.48, 0.55, 0.58], [0, 1, 1, 0]);
+  const overviewX = useTransform(scrollYProgress, [0.45, 0.48], ["-50px", "0px"]);
+
+  const workflowOpacity = useTransform(scrollYProgress, [0.6, 0.64, 0.72, 0.76], [0, 1, 1, 0]);
+  const workflowY = useTransform(scrollYProgress, [0.6, 0.64], [100, 0]);
+
+  const dashboardOpacity = useTransform(scrollYProgress, [0.75, 0.82, 1], [0, 1, 1]);
+  const dashboardScale = useTransform(scrollYProgress, [0.75, 0.85], [0.95, 1]);
+  const dashboardY = useTransform(scrollYProgress, [0.75, 0.85], [50, 0]);
+
+  const chaoticCards = Array.from({ length: 60 }).map((_, i) => ({
+    id: i,
+    startX: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 200 + 100) + "vw",
+    startY: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 200 + 100) + "vh",
+    rotation: Math.random() * 360,
+  }));
+
+  const days = ["M", "T", "W", "T", "F", "S", "S"];
+  const times = ["6A", "9A", "12P", "3P", "6P", "9P"];
+  const heatmapData = [
+    [0.8, 0.9, 0.4, 0.3, 0.7, 0.8],
+    [0.7, 0.8, 0.3, 0.2, 0.6, 0.7],
+    [0.9, 0.7, 0.5, 0.4, 0.8, 0.9],
+    [0.6, 0.8, 0.4, 0.3, 0.7, 0.6],
+    [0.7, 0.6, 0.5, 0.6, 0.9, 0.5],
+    [0.3, 0.5, 0.8, 0.9, 0.6, 0.4],
+    [0.2, 0.4, 0.7, 0.8, 0.5, 0.3],
+  ];
+
+  return (
+    <div ref={containerRef} className="h-[800vh] relative bg-[#F7F5F2]">
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+
+        {/* =========================================
+            STAGE 1: VAULTED Hero Lockup
+        ========================================= */}
+        <motion.div style={{ opacity: introOpacity, y: introY, scale: introScale }} className="absolute z-10 text-center px-6 w-full max-w-6xl">
+          <h1 className="text-[3.8rem] sm:text-[6rem] md:text-[10rem] lg:text-[14rem] font-bold tracking-[-0.04em] leading-none text-[#111] mb-4 md:mb-6 select-none">
+            VAULTED
+          </h1>
+          <div className="w-16 md:w-24 h-[2px] bg-[#C08B3A] mx-auto mb-4 md:mb-8" />
+          <p className="text-base sm:text-xl md:text-2xl text-[#111]/45 font-light tracking-wide max-w-lg mx-auto">
+            Your guests' room key, in their pocket, before they land.
+          </p>
+        </motion.div>
+
+        {/* =========================================
+            STAGE 2: Chaos — Opaque Cards Swarm In
+        ========================================= */}
+        <motion.div
+          style={{ scale: cardsScale, opacity: cardsOpacity }}
+          className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none bg-[#F7F5F2]"
+        >
+          {chaoticCards.map((card) => (
+            <ChaoticCard key={card.id} card={card} scrollYProgress={scrollYProgress} />
+          ))}
+          <motion.div style={{ opacity: cardsOpacity }} className="absolute text-center z-10 pointer-events-none w-full px-8">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-medium tracking-tighter text-[#111] mb-4 md:mb-6">
+              6 billion cards printed.<br/>
+              <span className="italic font-serif" style={{ color: AMBER }}>A third never come back.</span>
+            </h2>
+            <p className="text-base sm:text-xl text-[#111]/50 font-light max-w-2xl mx-auto px-4">
+              $300M+ in annual replacement costs — absorbed as plastic waste, staff overhead, and guest friction.
+            </p>
+          </motion.div>
+        </motion.div>
+
+        {/* =========================================
+            STAGE 3: Apple Wallet Pass
+        ========================================= */}
+        <motion.div style={{ scale: passScale, opacity: passOpacity, x: passX }} className="absolute z-20 flex flex-col items-center px-4">
+          <div className="w-[min(320px,88vw)] h-[min(500px,78vh)] bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] text-white rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.2),0_0_0_0.5px_rgba(0,0,0,0.1)] overflow-hidden relative">
+            <div className="px-6 pt-6 pb-4 flex justify-between items-start">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-[10px] overflow-hidden bg-white flex items-center justify-center p-1">
+                  <img src="/logo.png" alt="Vaulted" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold tracking-wide text-white/90">VAULTED</p>
+                  <p className="text-[11px] text-white/50">Hotel Key</p>
+                </div>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                <span className="text-lg leading-none font-bold text-white/60">···</span>
+              </div>
+            </div>
+
+            <div className="px-6 mt-4 space-y-6">
+              <div>
+                <p className="text-[11px] text-white/50 uppercase font-semibold mb-1 tracking-wider">GUEST NAME</p>
+                <p className="text-2xl font-medium">Asad Rizvi</p>
+              </div>
+              <div className="flex justify-between items-end border-b border-white/10 pb-6">
+                <div>
+                  <p className="text-[11px] text-white/50 uppercase font-semibold mb-1 tracking-wider">ROOM</p>
+                  <p className="text-5xl font-light font-serif" style={{ color: AMBER }}>667</p>
+                </div>
+                <div>
+                  <p className="text-[11px] text-white/50 uppercase font-semibold text-right mb-1 tracking-wider">DATES</p>
+                  <p className="text-lg font-medium">Oct 12 – 15</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute bottom-10 w-full flex justify-center">
+              <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center border border-white/20 relative">
+                <Nfc className="w-8 h-8 text-white/90" />
+                <motion.div
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0 rounded-full border"
+                  style={{ borderColor: `${AMBER}99` }}
+                />
+              </div>
+            </div>
+            <div className="absolute bottom-4 w-full text-center">
+              <p className="text-[10px] text-white/40 font-medium tracking-wide">Hold Near Reader</p>
+            </div>
+          </div>
+
+          <motion.div style={{ opacity: meetVaultedTextOpacity, y: meetVaultedTextY }} className="absolute -bottom-24 sm:-bottom-28 w-[min(500px,90vw)] text-center">
+            <h3 className="text-3xl sm:text-5xl font-medium tracking-tight text-[#111]">Meet Vaulted.</h3>
+          </motion.div>
+        </motion.div>
+
+        {/* =========================================
+            STAGE 4: 3-Point Overview
+        ========================================= */}
+        {/* Mobile: full-screen centered stack; Desktop: left-anchored beside pass card */}
+        <motion.div style={{ opacity: overviewOpacity, x: overviewX }} className="absolute z-20 inset-x-4 top-1/2 -translate-y-1/2 lg:inset-x-auto lg:translate-y-0 lg:top-auto lg:left-[15%] max-w-lg">
+          <h3 className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tighter mb-6 lg:mb-12 text-[#111] leading-[1.1]">
+            No card.<br/>
+            <span className="font-serif italic" style={{ color: AMBER }}>No queue.</span>
+          </h3>
+          <div className="space-y-10">
+            {[
+              { num: "01", title: "Works on your existing locks.", desc: "ASSA ABLOY, Salto, Dormakaba — if you have smart locks, you're already compatible. Zero cap-ex." },
+              { num: "02", title: "Guests walk straight to their room.", desc: "Key sent to Apple Wallet before check-in. Your front desk handles the guests who actually need it." },
+              { num: "03", title: "Keys that can't be copied.", desc: "256-bit encrypted. Tied to the guest's device. Revoke any key in seconds." },
+            ].map(({ num, title, desc }) => (
+              <div key={num} className="flex gap-8 items-start">
+                <span className="shrink-0 font-serif italic leading-none text-5xl" style={{ color: AMBER }}>
+                  {num}
+                </span>
+                <div>
+                  <h4 className="text-2xl font-medium text-[#111] mb-2">{title}</h4>
+                  <p className="text-[#111]/50 text-base leading-relaxed font-light">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* =========================================
+            STAGE 5: Plug & Play Integration
+        ========================================= */}
+        <motion.div style={{ opacity: workflowOpacity, y: workflowY }} className="absolute inset-0 z-30 flex items-center justify-center bg-[#F7F5F2]">
+          <div className="max-w-6xl w-full px-8 flex flex-col items-center text-center">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-medium tracking-tighter mb-4 md:mb-6 text-[#111]">
+              Live in <span className="font-serif italic" style={{ color: AMBER }}>under a week.</span>
+            </h2>
+            <p className="text-base sm:text-xl text-[#111]/40 max-w-2xl mb-10 md:mb-20 font-light">
+              Connect your PMS. We handle the rest. No downtime, no new hardware, no IT project.
+            </p>
+
+            <div className="flex flex-col md:flex-row items-center justify-center w-full gap-4 md:gap-8">
+              <div className="w-full max-w-[280px] bg-white rounded-[2rem] p-8 border border-black/6 shadow-sm">
+                <p className="text-xs uppercase tracking-widest text-black/30 font-bold mb-4">Your PMS</p>
+                <h3 className="text-2xl font-medium text-[#111] mb-2">Reservation Event</h3>
+                <p className="text-sm text-[#111]/40">Oracle OPERA, Mews, Cloudbeds</p>
+              </div>
+
+              <ArrowRight className="w-8 h-8 text-black/15 rotate-90 md:rotate-0" />
+
+              <div className="w-full max-w-[320px] rounded-[2rem] p-8 relative shadow-[0_0_60px_rgba(192,139,58,0.3)]" style={{ backgroundColor: AMBER }}>
+                <div className="absolute -top-4 -right-4 w-12 h-12 rounded-full overflow-hidden shadow-md bg-white flex items-center justify-center p-1.5">
+                  <img src="/logo.png" alt="Vaulted" className="w-full h-full object-contain" />
+                </div>
+                <p className="text-xs uppercase tracking-widest text-black/50 font-bold mb-4">Vaulted</p>
+                <h3 className="text-2xl font-medium text-black mb-2">Issues the key.</h3>
+                <p className="text-sm text-black/60">Check-in triggers a cryptographically signed key, sent directly to the guest's Apple Wallet.</p>
+              </div>
+
+              <ArrowRight className="w-8 h-8 text-black/15 rotate-90 md:rotate-0" />
+
+              <div className="w-full max-w-[280px] bg-white rounded-[2rem] p-8 border border-black/6 shadow-sm">
+                <p className="text-xs uppercase tracking-widest text-black/30 font-bold mb-4">Your Locks</p>
+                <h3 className="text-2xl font-medium text-[#111] mb-2">Door unlocks.</h3>
+                <p className="text-sm text-[#111]/40">ASSA ABLOY, Salto, Dormakaba</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* =========================================
+            STAGE 6: Behavioral Analytics Dashboard
+        ========================================= */}
+        <motion.div style={{ opacity: dashboardOpacity, y: dashboardY, scale: dashboardScale }} className="absolute inset-0 z-40 bg-[#F7F5F2] flex flex-col pt-20 md:pt-24 pb-4 md:pb-12 items-center overflow-hidden">
+          <div className="max-w-[1400px] w-full px-4 md:px-8 mb-4 md:mb-6 flex justify-between items-end">
+            <div>
+              <p className="font-bold tracking-[0.2em] uppercase text-xs mb-2" style={{ color: AMBER }}>Behavioral Engine</p>
+              <h2 className="text-2xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-[#111]">Data your PMS never tracked.</h2>
+            </div>
+          </div>
+
+          <div className="w-full max-w-[1400px] px-4 md:px-8 flex-1">
+            <div className="w-full h-full bg-white rounded-2xl md:rounded-[2rem] border border-black/5 shadow-[0_4px_40px_rgba(0,0,0,0.08)] p-4 md:p-8 flex flex-col overflow-hidden">
+
+              {/* Tabs */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8 pb-4 md:pb-6 border-b border-black/5">
+                <div className="flex gap-1 bg-black/4 rounded-full p-1">
+                  {[{ id: 'flow', label: 'Guest Flow' }, { id: 'facility', label: 'Facility Usage' }].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`px-3 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                        activeTab === tab.id
+                          ? 'bg-white text-[#111] shadow-sm'
+                          : 'text-[#111]/40 hover:text-[#111]/70'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="px-3 py-1.5 rounded-full bg-black/4 border border-black/5">
+                  <span className="text-xs text-[#111]/40 font-medium">Last 7 Days</span>
+                </div>
+              </div>
+
+              {/* Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-5 flex-1 min-h-0">
+
+                {/* Metric 1 */}
+                <div className="lg:col-span-4 bg-[#F7F5F2] rounded-2xl p-4 md:p-6 border border-black/4">
+                  <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-[#111]/30 mb-3 md:mb-5">Peak Room Return</p>
+                  <p className="text-4xl md:text-6xl font-light text-[#111] mb-1">11<span style={{ color: AMBER }}>:</span>45</p>
+                  <p className="text-xl md:text-2xl font-light text-[#111]/25 mb-3 md:mb-4">PM</p>
+                  <p className="text-xs text-[#111]/40 leading-relaxed">Your night staff is stretched thin. Now you know exactly why — and when.</p>
+                </div>
+
+                {/* Metric 2 */}
+                <div className="lg:col-span-4 bg-[#F7F5F2] rounded-2xl p-4 md:p-6 border border-black/4">
+                  <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-[#111]/30 mb-3 md:mb-5">Peak Gym Access</p>
+                  <p className="text-4xl md:text-6xl font-light text-[#111] mb-1">7<span style={{ color: AMBER }}>:</span>00</p>
+                  <p className="text-xl md:text-2xl font-light text-[#111]/25 mb-3 md:mb-4">AM</p>
+                  <p className="text-xs text-[#111]/40 leading-relaxed">Towels stocked before your guests arrive. Staffing planned to the hour, not the shift.</p>
+                </div>
+
+                {/* Metric 3 — amber hero */}
+                <div className="lg:col-span-4 rounded-2xl p-4 md:p-6 relative overflow-hidden" style={{ backgroundColor: AMBER }}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+                  <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-black/50 mb-3 md:mb-5">This Month</p>
+                  <p className="text-4xl md:text-6xl font-light text-black mb-1">8,492</p>
+                  <p className="text-xl md:text-2xl font-light text-black/40 mb-3 md:mb-4">entries</p>
+                  <p className="text-xs text-black/60 leading-relaxed">Every door access logged and timestamped. Your audit trail, always ready.</p>
+                </div>
+
+                {/* SVG Line Graph */}
+                <div className="lg:col-span-8 bg-[#F7F5F2] rounded-2xl p-4 md:p-6 border border-black/4">
+                  <div className="mb-3 md:mb-5 flex flex-col sm:flex-row justify-between sm:items-center gap-1">
+                    <h3 className="text-xs sm:text-sm font-semibold text-[#111] uppercase tracking-wider">Room Access Frequency (24h)</h3>
+                    <span className="text-[10px] sm:text-xs text-[#111]/30">11PM spike — night audit understaffed</span>
+                  </div>
+                  <div className="h-44 w-full relative">
+                    <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-[10px] text-[#111]/20 pb-6">
+                      <span>400</span><span>300</span><span>200</span><span>100</span><span>0</span>
+                    </div>
+                    <div className="ml-8 h-full relative">
+                      <div className="absolute inset-0 flex flex-col justify-between pb-6">
+                        {[...Array(4)].map((_, i) => <div key={i} className="w-full border-t border-black/[0.04]"></div>)}
+                        <div className="w-full border-t border-black/10"></div>
+                      </div>
+                      <svg className="absolute inset-0 h-[calc(100%-24px)] w-full" preserveAspectRatio="none" viewBox="0 0 1000 100">
+                        <defs>
+                          <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={AMBER} stopOpacity="0.3"/>
+                            <stop offset="100%" stopColor={AMBER} stopOpacity="0"/>
+                          </linearGradient>
+                        </defs>
+                        <path d="M0,90 Q100,90 150,70 T300,20 T400,60 T600,80 T800,60 T900,10 T1000,40" fill="none" stroke={AMBER} strokeWidth="2.5" />
+                        <path d="M0,90 Q100,90 150,70 T300,20 T400,60 T600,80 T800,60 T900,10 T1000,40 L1000,100 L0,100 Z" fill="url(#lineGrad)" />
+                      </svg>
+                      <div className="absolute bottom-0 w-full flex justify-between text-[10px] text-[#111]/30 px-2">
+                        <span>12 AM</span><span>4 AM</span><span>8 AM</span><span>12 PM</span><span>4 PM</span><span>8 PM</span><span>12 AM</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Heatmap — hidden on mobile to save space */}
+                <div className="hidden md:block lg:col-span-4 bg-[#F7F5F2] rounded-2xl p-6 border border-black/4">
+                  <h3 className="text-sm font-semibold text-[#111] uppercase tracking-wider mb-5">Gym Access Heatmap</h3>
+                  <div className="flex gap-2 h-44">
+                    <div className="flex flex-col justify-between text-[10px] text-[#111]/30 h-[calc(100%-20px)] py-1">
+                      {days.map((d, i) => <span key={i}>{d}</span>)}
+                    </div>
+                    <div className="flex-1 flex flex-col gap-1">
+                      {heatmapData.map((row, i) => (
+                        <div key={i} className="flex-1 flex gap-1">
+                          {row.map((val, j) => (
+                            <div key={j} className="flex-1 rounded-sm" style={{ backgroundColor: AMBER_RGBA(val * 0.8) }}></div>
+                          ))}
+                        </div>
+                      ))}
+                      <div className="flex justify-between text-[9px] text-[#111]/30 mt-1">
+                        {times.map((t, i) => <span key={i}>{t}</span>)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+      </div>
+    </div>
+  );
+};

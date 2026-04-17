@@ -1,0 +1,94 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+
+const AMBER = '#C08B3A';
+
+export const CTASection = () => {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('idle');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+    setStatus('loading');
+    await new Promise(r => setTimeout(r, 800));
+    setStatus('success');
+    setEmail('');
+  };
+
+  return (
+    <section id="cta-section" className="relative overflow-hidden" style={{ backgroundColor: '#111111' }}>
+      {/* Subtle ambient — pushed far to corners, won't bleed over text */}
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none" style={{ backgroundColor: `${AMBER}18` }} />
+      <div className="absolute top-0 left-0 w-[400px] h-[400px] rounded-full blur-[140px] pointer-events-none" style={{ backgroundColor: `${AMBER}0D` }} />
+
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-8 py-20 sm:py-40 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          viewport={{ once: true }}
+        >
+          <div className="inline-flex items-center gap-4 mb-12">
+            <div className="w-12 h-[1px]" style={{ backgroundColor: AMBER }} />
+            <span className="text-[10px] uppercase tracking-[0.4em] font-bold" style={{ color: AMBER }}>2026 Pilot Cohort</span>
+            <div className="w-12 h-[1px]" style={{ backgroundColor: AMBER }} />
+          </div>
+
+          <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-[7rem] font-medium tracking-tighter leading-[0.9] mb-8" style={{ color: '#FFFFFF' }}>
+            12 properties.<br />
+            <span className="font-serif italic" style={{ color: 'rgba(255,255,255,0.35)' }}>July 2026.</span>
+          </h2>
+
+          <p className="text-xl max-w-xl mx-auto mb-16 font-light leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+            We're running a tight pilot cohort this summer. No setup fee. White-glove onboarding. Live in under a week — or we refund you.
+          </p>
+
+          {status === 'success' ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="inline-flex flex-col items-center gap-3"
+            >
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-2" style={{ backgroundColor: `${AMBER}30`, border: `1px solid ${AMBER}50` }}>
+                <span className="text-2xl text-white">✓</span>
+              </div>
+              <p className="text-white text-lg font-medium">Application received.</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>We'll be in touch within 48 hours.</p>
+            </motion.div>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="gm@yourproperty.com"
+                required
+                className="flex-1 text-white text-sm px-6 py-4 rounded-full focus:outline-none transition-colors"
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  placeholderColor: 'rgba(255,255,255,0.3)',
+                }}
+              />
+              <button
+                type="submit"
+                disabled={status === 'loading'}
+                className="flex items-center justify-center gap-2 px-8 py-4 rounded-full text-xs uppercase tracking-widest font-bold transition-all duration-300 disabled:opacity-50 whitespace-nowrap"
+                style={{ backgroundColor: AMBER, color: '#000' }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#fff'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = AMBER}
+              >
+                {status === 'loading' ? 'Sending...' : 'Apply for Pilot →'}
+              </button>
+            </form>
+          )}
+
+            <p className="text-xs mt-8 uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.18)' }}>
+              12 spots · July 2026 · No setup fee
+            </p>
+        </motion.div>
+      </div>
+    </section>
+  );
+};

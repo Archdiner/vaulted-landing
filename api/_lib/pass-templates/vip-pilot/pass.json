@@ -1,0 +1,53 @@
+{
+  "formatVersion": 1,
+  "passTypeIdentifier": "PASS_TYPE_IDENTIFIER",
+  "teamIdentifier": "TEAM_IDENTIFIER",
+  "organizationName": "Vaulted",
+  "description": "Vaulted VIP Pilot Access",
+  "serialNumber": "SERIAL_NUMBER",
+  "foregroundColor": "rgb(255, 255, 255)",
+  "backgroundColor": "rgb(26, 26, 26)",
+  "labelColor": "rgb(184, 149, 106)",
+  "generic": {
+    "primaryFields": [
+      {
+        "key": "program",
+        "label": "PROGRAM",
+        "value": "Vaulted Pilot"
+      }
+    ],
+    "secondaryFields": [
+      {
+        "key": "status",
+        "label": "STATUS",
+        "value": "VIP Access"
+      }
+    ],
+    "auxiliaryFields": [
+      {
+        "key": "cohort",
+        "label": "COHORT",
+        "value": "July 2026",
+        "textAlignment": "PKTextAlignmentLeft"
+      },
+      {
+        "key": "member",
+        "label": "MEMBER",
+        "value": "Early Adopter",
+        "textAlignment": "PKTextAlignmentRight"
+      }
+    ],
+    "backFields": [
+      {
+        "key": "info",
+        "label": "Vaulted Pilot Program",
+        "value": "You are part of an exclusive group of hospitality innovators exploring the future of guest access.\n\nThe July 2026 cohort is limited to 12 properties worldwide."
+      },
+      {
+        "key": "support",
+        "label": "Partnership Inquiries",
+        "value": "pilot@vaulted.com"
+      }
+    ]
+  }
+}

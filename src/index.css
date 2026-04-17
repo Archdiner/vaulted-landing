@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brass: #B8956A;
+  --color-stone: #F8F7F4;
+  --color-linen: #EAE8E2;
+  --color-obsidian: #1A1A1A;
+  --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  text-align: left;
+}
+
+html {
+  scroll-behavior: smooth;
+}

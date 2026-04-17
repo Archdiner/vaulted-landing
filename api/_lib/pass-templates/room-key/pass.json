@@ -1,0 +1,53 @@
+{
+  "formatVersion": 1,
+  "passTypeIdentifier": "PASS_TYPE_IDENTIFIER",
+  "teamIdentifier": "TEAM_IDENTIFIER",
+  "organizationName": "Vaulted",
+  "description": "Vaulted Hotel Room Key",
+  "serialNumber": "SERIAL_NUMBER",
+  "foregroundColor": "rgb(255, 255, 255)",
+  "backgroundColor": "rgb(26, 26, 26)",
+  "labelColor": "rgb(184, 149, 106)",
+  "generic": {
+    "primaryFields": [
+      {
+        "key": "room",
+        "label": "ROOM",
+        "value": "Suite 407"
+      }
+    ],
+    "secondaryFields": [
+      {
+        "key": "hotel",
+        "label": "PROPERTY",
+        "value": "The Vaulted"
+      }
+    ],
+    "auxiliaryFields": [
+      {
+        "key": "checkin",
+        "label": "CHECK-IN",
+        "value": "Jul 15",
+        "textAlignment": "PKTextAlignmentLeft"
+      },
+      {
+        "key": "checkout",
+        "label": "CHECK-OUT",
+        "value": "Jul 18",
+        "textAlignment": "PKTextAlignmentRight"
+      }
+    ],
+    "backFields": [
+      {
+        "key": "info",
+        "label": "About Vaulted",
+        "value": "Vaulted is redefining hotel access with digital-first, wallet-native room keys. This demo pass showcases the seamless guest experience.\n\nLearn more at vaulted.com"
+      },
+      {
+        "key": "support",
+        "label": "Support",
+        "value": "hello@vaulted.com"
+      }
+    ]
+  }
+}
