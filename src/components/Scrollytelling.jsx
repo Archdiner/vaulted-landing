@@ -411,11 +411,103 @@ const DashboardSection = ({ activeTab, setActiveTab }) => {
 };
 
 /* ============================================================
+   MOBILE CHAOS CARDS — small cards swarm in for "6 billion" stage
+   ============================================================ */
+const MobileChaoticCard = ({ card, delay }) => {
+  const ref = useRef(null);
+  const [style, setStyle] = useState({ opacity: 0, x: 0, y: 0, rotate: 0 });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStyle({
+            opacity: 1,
+            x: 0,
+            y: 0,
+            rotate: 0,
+            transition: { duration: 0.4, delay, ease: [0.16, 1, 0.3, 1] },
+          });
+        }
+      },
+      { threshold: 0.3 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [delay]);
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, x: card.startX, y: card.startY, rotate: card.rotation }}
+      animate={style}
+      className="absolute w-24 h-14 sm:w-28 sm:h-16 bg-white rounded-lg border border-black/8 shadow-[0_4px_20px_rgba(0,0,0,0.12)] flex flex-col justify-between p-2 sm:p-3"
+    >
+      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: AMBER, opacity: 0.7 }} />
+      <div className="space-y-1">
+        <div className="h-1 w-full bg-black/10 rounded" />
+        <div className="h-1 w-2/3 bg-black/6 rounded" />
+      </div>
+    </motion.div>
+  );
+};
+
+const MobileChaosSection = () => {
+  const sectionRef = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  const chaoticCards = Array.from({ length: 40 }).map((_, i) => ({
+    id: i,
+    startX: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 200 + 80) + "vw",
+    startY: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 150 + 60) + "vh",
+    rotation: Math.random() * 360,
+  }));
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={sectionRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#F7F5F2]">
+      {/* Cards */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        {chaoticCards.map((card, i) => (
+          <MobileChaoticCard key={card.id} card={card} delay={i * 0.015} />
+        ))}
+      </div>
+      {/* Text */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: visible ? 1 : 0 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+        className="relative z-10 text-center px-8"
+      >
+        <h2 className="text-3xl sm:text-5xl font-medium tracking-tighter text-[#111] mb-4">
+          6 billion cards printed.<br/>
+          <span className="italic font-serif" style={{ color: AMBER }}>A third never come back.</span>
+        </h2>
+        <p className="text-base sm:text-lg text-[#111]/50 font-light max-w-2xl mx-auto">
+          $300M+ in annual replacement costs — absorbed as plastic waste, staff overhead, and guest friction.
+        </p>
+      </motion.div>
+    </div>
+  );
+};
+
+/* ============================================================
    MOBILE: Simple vertical scroll with fade-in sections
    ============================================================ */
 const MobileScrollytelling = () => {
   const [activeTab, setActiveTab] = useState('flow');
-  const [cardVisible, setCardVisible] = useState(true);
 
   return (
     <div className="bg-[#F7F5F2]">
@@ -435,19 +527,8 @@ const MobileScrollytelling = () => {
         </div>
       </motion.section>
 
-      {/* Stage 2: Problem statement */}
-      <motion.section
-        variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
-        className="py-24 px-6 text-center"
-      >
-        <h2 className="text-3xl sm:text-5xl font-medium tracking-tighter text-[#111] mb-4">
-          6 billion cards printed.<br/>
-          <span className="italic font-serif" style={{ color: AMBER }}>A third never come back.</span>
-        </h2>
-        <p className="text-base sm:text-lg text-[#111]/50 font-light max-w-2xl mx-auto">
-          $300M+ in annual replacement costs — absorbed as plastic waste, staff overhead, and guest friction.
-        </p>
-      </motion.section>
+      {/* Stage 2: Chaos cards — preserved signature animation */}
+      <MobileChaosSection />
 
       {/* Stage 3: Pass card + Meet Vaulted */}
       <motion.section
