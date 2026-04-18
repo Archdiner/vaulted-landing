@@ -33,6 +33,136 @@ const ChaoticCard = ({ card, scrollYProgress }) => {
    SHARED UI PIECES (used by both mobile & desktop)
    ============================================================ */
 
+/* ============================================================
+   SCATTER CARD — breaks into fragments when it leaves viewport
+   ============================================================ */
+const ScatterCard = ({ onScatter }) => {
+  const cardRef = useRef(null);
+  const [scattered, setScattered] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setVisible(true);
+      },
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
+    const el = cardRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting && visible) {
+          setScattered(true);
+          setTimeout(() => onScatter && onScatter(), 600);
+        }
+      },
+      { threshold: 0 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [visible]);
+
+  const scatterDirs = [
+    { x: -180, y: -120, rotate: -25 },
+    { x: 200, y: -80, rotate: 35 },
+    { x: -220, y: 100, rotate: 15 },
+    { x: 160, y: 140, rotate: -40 },
+  ];
+
+  const pieces = [
+    { id: 'header', className: 'absolute top-0 left-0 right-0 px-6 pt-6 pb-4 flex justify-between items-start z-10' },
+    { id: 'body', className: 'absolute top-[22%] left-0 right-0 px-6 z-10' },
+    { id: 'nfc', className: 'absolute bottom-10 w-full flex justify-center z-10' },
+    { id: 'label', className: 'absolute bottom-4 w-full text-center z-10' },
+  ];
+
+  if (!visible) return <div ref={cardRef} className="w-[min(320px,88vw)] h-[min(500px,78vh)] shrink-0" />;
+  if (scattered) return null;
+
+  return (
+    <motion.div
+      ref={cardRef}
+      initial={{ opacity: 0, scale: 0.85 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="w-[min(320px,88vw)] h-[min(500px,78vh)] bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] text-white rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.2),0_0_0_0.5px_rgba(0,0,0,0.1)] overflow-hidden relative"
+    >
+      {pieces.map((piece, i) => (
+        <motion.div
+          key={piece.id}
+          className={piece.className}
+          animate={{
+            opacity: scattered ? 0 : 1,
+            x: scattered ? scatterDirs[i].x : 0,
+            y: scattered ? scatterDirs[i].y : 0,
+            rotate: scattered ? scatterDirs[i].rotate : 0,
+            scale: scattered ? 0.2 : 1,
+          }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {piece.id === 'header' && (
+            <div className="flex justify-between items-start">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-[10px] overflow-hidden bg-white flex items-center justify-center p-1">
+                  <img src="/logo.png" alt="Vaulted" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold tracking-wide text-white/90">VAULTED</p>
+                  <p className="text-[11px] text-white/50">Hotel Key</p>
+                </div>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                <span className="text-lg leading-none font-bold text-white/60">···</span>
+              </div>
+            </div>
+          )}
+          {piece.id === 'body' && (
+            <div className="space-y-6">
+              <div>
+                <p className="text-[11px] text-white/50 uppercase font-semibold mb-1 tracking-wider">GUEST NAME</p>
+                <p className="text-2xl font-medium">Asad Rizvi</p>
+              </div>
+              <div className="flex justify-between items-end border-b border-white/10 pb-6">
+                <div>
+                  <p className="text-[11px] text-white/50 uppercase font-semibold mb-1 tracking-wider">ROOM</p>
+                  <p className="text-5xl font-light font-serif" style={{ color: AMBER }}>667</p>
+                </div>
+                <div>
+                  <p className="text-[11px] text-white/50 uppercase font-semibold text-right mb-1 tracking-wider">DATES</p>
+                  <p className="text-lg font-medium">Oct 12 – 15</p>
+                </div>
+              </div>
+            </div>
+          )}
+          {piece.id === 'nfc' && (
+            <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center border border-white/20 relative">
+              <Nfc className="w-8 h-8 text-white/90" />
+              <motion.div
+                animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-0 rounded-full border"
+                style={{ borderColor: `${AMBER}99` }}
+              />
+            </div>
+          )}
+          {piece.id === 'label' && (
+            <p className="text-[10px] text-white/40 font-medium tracking-wide">Hold Near Reader</p>
+          )}
+        </motion.div>
+      ))}
+    </motion.div>
+  );
+};
+
 const PassCard = () => (
   <div className="w-[min(320px,88vw)] h-[min(500px,78vh)] bg-gradient-to-br from-[#1C1C1E] to-[#2C2C2E] text-white rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.2),0_0_0_0.5px_rgba(0,0,0,0.1)] overflow-hidden relative">
     <div className="px-6 pt-6 pb-4 flex justify-between items-start">
@@ -49,7 +179,6 @@ const PassCard = () => (
         <span className="text-lg leading-none font-bold text-white/60">···</span>
       </div>
     </div>
-
     <div className="px-6 mt-4 space-y-6">
       <div>
         <p className="text-[11px] text-white/50 uppercase font-semibold mb-1 tracking-wider">GUEST NAME</p>
@@ -66,7 +195,6 @@ const PassCard = () => (
         </div>
       </div>
     </div>
-
     <div className="absolute bottom-10 w-full flex justify-center">
       <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center border border-white/20 relative">
         <Nfc className="w-8 h-8 text-white/90" />
@@ -287,6 +415,7 @@ const DashboardSection = ({ activeTab, setActiveTab }) => {
    ============================================================ */
 const MobileScrollytelling = () => {
   const [activeTab, setActiveTab] = useState('flow');
+  const [cardVisible, setCardVisible] = useState(true);
 
   return (
     <div className="bg-[#F7F5F2]">
@@ -325,7 +454,7 @@ const MobileScrollytelling = () => {
         variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}
         className="py-16 flex flex-col items-center gap-8 px-4"
       >
-        <PassCard />
+        <ScatterCard onScatter={() => setCardVisible(false)} />
         <h3 className="text-3xl sm:text-5xl font-medium tracking-tight text-[#111] text-center">Meet Vaulted.</h3>
       </motion.section>
 
