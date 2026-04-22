@@ -15,9 +15,11 @@ const ChaoticCard = ({ card, scrollYProgress }) => {
   const x = useTransform(scrollYProgress, [0.1, 0.3], [card.startX, '0vw']);
   const y = useTransform(scrollYProgress, [0.1, 0.3], [card.startY, '0vh']);
   const rotate = useTransform(scrollYProgress, [0.1, 0.3], [card.rotation, card.rotation - 180]);
+  const opacity = useTransform(scrollYProgress, [0.26, 0.32], [1, 0]);
+  
   return (
     <motion.div
-      style={{ x, y, rotate }}
+      style={{ x, y, rotate, opacity }}
       className="absolute w-32 h-20 bg-white rounded-lg border border-black/8 shadow-[0_4px_20px_rgba(0,0,0,0.12)] flex flex-col justify-between p-3"
     >
       <div className="w-4 h-4 rounded-full" style={{ backgroundColor: AMBER, opacity: 0.7 }} />
@@ -507,61 +509,110 @@ const MobileChaosSection = () => {
    MOBILE: Simple vertical scroll with fade-in sections
    ============================================================ */
 const MobileScrollytelling = () => {
+  const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState('flow');
 
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  const introOpacity = useTransform(scrollYProgress, [0, 0.1, 0.15, 0.18], [1, 1, 0, 0]);
+  const introY = useTransform(scrollYProgress, [0, 0.18], [0, -30]);
+  const introScale = useTransform(scrollYProgress, [0, 0.18], [1, 0.95]);
+  const introDisplay = useTransform(scrollYProgress, (p) => (p > 0.19 ? "none" : "block"));
+
+  const cardsScale = useTransform(scrollYProgress, [0.12, 0.25, 0.35], [3, 1, 0.9]);
+  const cardsOpacity = useTransform(scrollYProgress, [0.12, 0.18, 0.32, 0.38], [0, 1, 1, 0]);
+
+  const passScale = useTransform(scrollYProgress, [0.3, 0.4, 0.55, 0.65], [0.7, 1, 1, 0.8]);
+  const passOpacity = useTransform(scrollYProgress, [0.3, 0.4, 0.55, 0.6], [0, 1, 1, 0]);
+  const passY = useTransform(scrollYProgress, [0.45, 0.5], ["0%", "-10%"]);
+
+  const meetVaultedTextOpacity = useTransform(scrollYProgress, [0.38, 0.45, 0.48, 0.52], [0, 1, 1, 0]);
+  const meetVaultedTextY = useTransform(scrollYProgress, [0.38, 0.45], [30, 0]);
+
+  const overviewOpacity = useTransform(scrollYProgress, [0.48, 0.52, 0.65, 0.68], [0, 1, 1, 0]);
+  const overviewY = useTransform(scrollYProgress, [0.48, 0.52], [40, 0]);
+
+  const workflowOpacity = useTransform(scrollYProgress, [0.65, 0.7, 0.82, 0.85], [0, 1, 1, 0]);
+  const workflowY = useTransform(scrollYProgress, [0.65, 0.7], [60, 0]);
+
+  const dashboardOpacity = useTransform(scrollYProgress, [0.82, 0.88, 1], [0, 1, 1]);
+  const dashboardScale = useTransform(scrollYProgress, [0.82, 0.9], [0.95, 1]);
+  const dashboardY = useTransform(scrollYProgress, [0.82, 0.9], [40, 0]);
+
+  const chaoticCards = Array.from({ length: 25 }).map((_, i) => ({
+    id: i,
+    startX: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 150 + 50) + "vw",
+    startY: (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 100 + 40) + "vh",
+    rotation: Math.random() * 360,
+  }));
+
   return (
-    <div className="bg-[#F7F5F2]">
-      {/* Stage 1: Hero */}
-      <motion.section
-        variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
-        className="min-h-screen flex items-center justify-center text-center px-6"
-      >
-        <div className="max-w-6xl">
-          <h1 className="text-[3.8rem] sm:text-[6rem] font-bold tracking-[-0.04em] leading-none text-[#111] mb-4 select-none">
-            VAULTED
+    <div ref={containerRef} className="h-[600vh] relative bg-[#F7F5F2]">
+      <div className="sticky top-0 h-[100svh] w-full overflow-hidden flex items-center justify-center">
+
+        {/* STAGE 1: Hero */}
+        <motion.div style={{ opacity: introOpacity, y: introY, scale: introScale, display: introDisplay }} className="absolute z-10 text-center px-4 w-full">
+          <h1 className="text-[4.5rem] sm:text-[7rem] font-serif italic tracking-tight leading-none text-[#111] mb-6 select-none relative inline-block">
+            Vaulted
+            <svg className="absolute -bottom-4 sm:-bottom-6 left-0 w-full h-6 sm:h-8 text-[#C08B3A] opacity-80" viewBox="0 0 200 20" preserveAspectRatio="none" fill="none">
+              <path d="M5,15 Q50,0 100,10 T195,5" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+            </svg>
           </h1>
-          <div className="w-16 h-[2px] bg-[#C08B3A] mx-auto mb-4" />
-          <p className="text-base sm:text-xl text-[#111]/45 font-light tracking-wide max-w-lg mx-auto">
+          <p className="text-base sm:text-xl text-[#111]/45 font-light tracking-wide max-w-sm mx-auto">
             Your guests' room key, in their pocket, before they land.
           </p>
-        </div>
-      </motion.section>
+        </motion.div>
 
-      {/* Stage 2: Chaos cards — preserved signature animation */}
-      <MobileChaosSection />
+        {/* STAGE 2: Chaos cards */}
+        <motion.div
+          style={{ scale: cardsScale, opacity: cardsOpacity }}
+          className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none bg-[#F7F5F2]"
+        >
+          {chaoticCards.map((card) => (
+            <ChaoticCard key={card.id} card={card} scrollYProgress={scrollYProgress} />
+          ))}
+          <motion.div style={{ opacity: cardsOpacity }} className="absolute text-center z-10 pointer-events-none w-full px-6">
+            <h2 className="text-3xl sm:text-5xl font-medium tracking-tighter text-[#111] mb-4">
+              6 billion cards printed.<br/>
+              <span className="italic font-serif" style={{ color: AMBER }}>A third never come back.</span>
+            </h2>
+            <p className="text-base sm:text-lg text-[#111]/50 font-light max-w-md mx-auto">
+              $300M+ in annual replacement costs — absorbed as plastic waste, staff overhead, and guest friction.
+            </p>
+          </motion.div>
+        </motion.div>
 
-      {/* Stage 3: Pass card + Meet Vaulted */}
-      <motion.section
-        variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}
-        className="py-16 flex flex-col items-center gap-8 px-4"
-      >
-        <ScatterCard onScatter={() => setCardVisible(false)} />
-        <h3 className="text-3xl sm:text-5xl font-medium tracking-tight text-[#111] text-center">Meet Vaulted.</h3>
-      </motion.section>
+        {/* STAGE 3: Pass card */}
+        <motion.div style={{ scale: passScale, opacity: passOpacity, y: passY }} className="absolute z-20 flex flex-col items-center px-4">
+          <div className="scale-90 origin-center sm:scale-100">
+            <PassCard />
+          </div>
+          <motion.div style={{ opacity: meetVaultedTextOpacity, y: meetVaultedTextY }} className="absolute -bottom-20 w-full text-center">
+            <h3 className="text-3xl sm:text-5xl font-medium tracking-tight text-[#111]">Meet Vaulted.</h3>
+          </motion.div>
+        </motion.div>
 
-      {/* Stage 4: 3-step overview */}
-      <motion.section
-        variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }}
-        className="py-20 px-6 max-w-lg mx-auto"
-      >
-        <OverviewSteps />
-      </motion.section>
+        {/* STAGE 4: Overview */}
+        <motion.div style={{ opacity: overviewOpacity, y: overviewY }} className="absolute z-20 px-6 max-w-sm w-full">
+          <OverviewSteps />
+        </motion.div>
 
-      {/* Stage 5: Workflow */}
-      <motion.section
-        variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}
-        className="py-20 flex items-center justify-center bg-[#F7F5F2]"
-      >
-        <WorkflowCards />
-      </motion.section>
+        {/* STAGE 5: Workflow */}
+        <motion.div style={{ opacity: workflowOpacity, y: workflowY }} className="absolute inset-0 z-30 flex items-center justify-center bg-[#F7F5F2] overflow-y-auto">
+          <div className="py-8">
+            <WorkflowCards />
+          </div>
+        </motion.div>
 
-      {/* Stage 6: Dashboard */}
-      <motion.section
-        variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }}
-        className="py-16 flex flex-col items-center bg-[#F7F5F2]"
-      >
-        <DashboardSection activeTab={activeTab} setActiveTab={setActiveTab} />
-      </motion.section>
+        {/* STAGE 6: Dashboard */}
+        <motion.div style={{ opacity: dashboardOpacity, y: dashboardY, scale: dashboardScale }} className="absolute inset-0 z-40 bg-[#F7F5F2] flex flex-col pt-16 pb-8 items-center overflow-y-auto w-full">
+          <DashboardSection activeTab={activeTab} setActiveTab={setActiveTab} />
+        </motion.div>
+
+      </div>
     </div>
   );
 };
@@ -581,6 +632,7 @@ const DesktopScrollytelling = () => {
   const introOpacity = useTransform(scrollYProgress, [0, 0.08, 0.12, 0.15], [1, 1, 0, 0]);
   const introY = useTransform(scrollYProgress, [0, 0.15], [0, -50]);
   const introScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.95]);
+  const introDisplay = useTransform(scrollYProgress, (p) => (p > 0.16 ? "none" : "block"));
 
   const cardsScale = useTransform(scrollYProgress, [0.1, 0.2, 0.3], [5, 1, 0.9]);
   const cardsOpacity = useTransform(scrollYProgress, [0.1, 0.15, 0.28, 0.35], [0, 1, 1, 0]);
@@ -614,11 +666,13 @@ const DesktopScrollytelling = () => {
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
 
         {/* STAGE 1: Hero */}
-        <motion.div style={{ opacity: introOpacity, y: introY, scale: introScale }} className="absolute z-10 text-center px-6 w-full max-w-6xl">
-          <h1 className="text-[10rem] lg:text-[14rem] font-bold tracking-[-0.04em] leading-none text-[#111] mb-6 select-none">
-            VAULTED
+        <motion.div style={{ opacity: introOpacity, y: introY, scale: introScale, display: introDisplay }} className="absolute z-10 text-center px-6 w-full max-w-6xl">
+          <h1 className="text-[10rem] lg:text-[14rem] font-serif italic tracking-tight leading-none text-[#111] mb-10 select-none relative inline-block">
+            Vaulted
+            <svg className="absolute -bottom-6 left-0 w-full h-12 text-[#C08B3A] opacity-80" viewBox="0 0 200 20" preserveAspectRatio="none" fill="none">
+              <path d="M5,15 Q50,0 100,10 T195,5" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
+            </svg>
           </h1>
-          <div className="w-24 h-[2px] bg-[#C08B3A] mx-auto mb-8" />
           <p className="text-xl md:text-2xl text-[#111]/45 font-light tracking-wide max-w-lg mx-auto">
             Your guests' room key, in their pocket, before they land.
           </p>
