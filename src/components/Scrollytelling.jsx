@@ -601,14 +601,14 @@ const MobileScrollytelling = () => {
         </motion.div>
 
         {/* STAGE 5: Workflow */}
-        <motion.div style={{ opacity: workflowOpacity, y: workflowY }} className="absolute inset-0 z-30 flex items-center justify-center bg-[#F7F5F2] overflow-y-auto">
+        <motion.div style={{ opacity: workflowOpacity, y: workflowY }} className="absolute inset-0 z-30 flex items-center justify-center bg-[#F7F5F2] pointer-events-none">
           <div className="py-8">
             <WorkflowCards />
           </div>
         </motion.div>
 
         {/* STAGE 6: Dashboard */}
-        <motion.div style={{ opacity: dashboardOpacity, y: dashboardY, scale: dashboardScale }} className="absolute inset-0 z-40 bg-[#F7F5F2] flex flex-col pt-16 pb-8 items-center overflow-y-auto w-full">
+        <motion.div style={{ opacity: dashboardOpacity, y: dashboardY, scale: dashboardScale, pointerEvents: useTransform(scrollYProgress, p => p > 0.81 ? "auto" : "none") }} className="absolute inset-0 z-40 bg-[#F7F5F2] flex flex-col pt-16 pb-8 items-center w-full overflow-hidden">
           <DashboardSection activeTab={activeTab} setActiveTab={setActiveTab} />
         </motion.div>
 
@@ -711,12 +711,12 @@ const DesktopScrollytelling = () => {
         </motion.div>
 
         {/* STAGE 5: Workflow */}
-        <motion.div style={{ opacity: workflowOpacity, y: workflowY }} className="absolute inset-0 z-30 flex items-center justify-center bg-[#F7F5F2]">
+        <motion.div style={{ opacity: workflowOpacity, y: workflowY }} className="absolute inset-0 z-30 flex items-center justify-center bg-[#F7F5F2] pointer-events-none">
           <WorkflowCards />
         </motion.div>
 
         {/* STAGE 6: Dashboard */}
-        <motion.div style={{ opacity: dashboardOpacity, y: dashboardY, scale: dashboardScale }} className="absolute inset-0 z-40 bg-[#F7F5F2] flex flex-col pt-24 pb-12 items-center overflow-hidden">
+        <motion.div style={{ opacity: dashboardOpacity, y: dashboardY, scale: dashboardScale, pointerEvents: useTransform(scrollYProgress, p => p > 0.81 ? "auto" : "none") }} className="absolute inset-0 z-40 bg-[#F7F5F2] flex flex-col pt-24 pb-12 items-center overflow-hidden">
           <DashboardSection activeTab={activeTab} setActiveTab={setActiveTab} />
         </motion.div>
 
